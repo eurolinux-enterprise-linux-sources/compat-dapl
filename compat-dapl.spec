@@ -1,7 +1,7 @@
 Name: compat-dapl
 Epoch: 1
 Version: 1.2.15
-Release: 2.1%{?dist}.1
+Release: 2.2%{?dist}
 Summary: Library providing access to the DAT 1.2 API
 Group: System Environment/Libraries
 Obsoletes: udapl < 1.3, dapl < 1.2.2, compat-dapl-1.2.5 < 2.1
@@ -52,7 +52,7 @@ Useful test suites to validate the dapl library API's and operation.
 %setup -q
 %patch0 -p1 -b .pipe_leak
 %patch1 -p1 -b .mem_leak
-%patch2 -p1 -b .bz673992
+%patch2 -p1 -b .bz635155
 aclocal -I config && libtoolize --force --copy && autoheader && \
     automake --foreign --add-missing --copy && autoconf
 
@@ -100,9 +100,9 @@ rm -rf %{buildroot}
 %{_mandir}/man1/*1.1.gz
 
 %changelog
-* Mon Jan 31 2011 Jay Fenlason <fenlason@redhat.com> 1:1.2.15-2.1.el6.0.1
-- Include compat-dapl-cleanup-cr-linkings-after-dto-error-on-ep.patch
-  Resolves: bz673992
+* Fri Jan 28 2011 Jay Fenlason <fenlason@redhat.com> - 1:1.2.15-2.2.el6
+- compat-dapl-cleanup-cr-linkings-after-dto-error-on-ep.patch
+  Resolves: bz635155
 
 * Mon Aug 01 2010 Jay Fenlason <fenlason@redhat.com> - 1:1.2.15-2.1.el6
 - Include pipe-leak patch to close
