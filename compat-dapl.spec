@@ -1,7 +1,7 @@
 Name: compat-dapl
 Epoch: 1
 Version: 1.2.19
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Library providing access to the DAT 1.2 API
 Group: System Environment/Libraries
 Obsoletes: udapl < 1.3, dapl < 1.2.2, compat-dapl-1.2.5 < 2.1
@@ -94,6 +94,10 @@ rm -rf %{buildroot}
 %{_mandir}/man1/*1.1.gz
 
 %changelog
+* Mon Jan 23 2012 Doug Ledford <dledford@redhat.com> - 1:1.2.19-2
+- Bump and rebuild against new libibverbs (FDR link speed support)
+- Related: bz750609
+
 * Fri Jul 22 2011 Doug Ledford <dledford@redhat.com> - 1:1.2.19-1
 - Update to latest upstream release (1.2.15 -> 1.2.19)
 - Remove 3 patches rolled into upstream
