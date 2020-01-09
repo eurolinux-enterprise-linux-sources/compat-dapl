@@ -1168,25 +1168,17 @@ dapli_evd_cqe_to_event (
     /*
      * Most error DTO ops result in disconnecting the EP. See
      * IBTA Vol 1.1, Chapter 10,Table 68, for expected effect on
-     * state.
+     * state. The QP going to error state will trigger disconnect
+     * at provider level. QP errors and CM events are independent,
+     * issue CM disconnect and cleanup any pending CR's 
      */
-    if ((dto_status != DAT_DTO_SUCCESS) &&
-        (dto_status != DAT_DTO_ERR_FLUSHED))
+    if ((dto_status != DAT_DTO_SUCCESS) && (dto_status != DAT_DTO_ERR_FLUSHED))
     {
-	DAPL_EVD		*evd_ptr;
-
-	/*
-	 * If we are connected, generate disconnect and generate an
-	 * event. We may be racing with other disconnect ops, so we
-	 * need to check. We may also be racing CM connection events,
-	 * requiring us to check for connection pending states too.
-	 */
 	dapl_os_lock ( &ep_ptr->header.lock );
 	if (ep_ptr->param.ep_state == DAT_EP_STATE_CONNECTED ||
 	    ep_ptr->param.ep_state == DAT_EP_STATE_ACTIVE_CONNECTION_PENDING ||
 	    ep_ptr->param.ep_state == DAT_EP_STATE_PASSIVE_CONNECTION_PENDING||
 	    ep_ptr->param.ep_state == DAT_EP_STATE_COMPLETION_PENDING )
-
 	{
 	    ep_ptr->param.ep_state = DAT_EP_STATE_DISCONNECTED;
 	    dapl_os_unlock ( &ep_ptr->header.lock );
@@ -1197,6 +1189,7 @@ dapli_evd_cqe_to_event (
 
 	    /* ... and clean up the local side */
 	    evd_ptr = (DAPL_EVD *) ep_ptr->param.connect_evd_handle;
+	    dapl_sp_remove_ep(ep_ptr);
 	    if (evd_ptr != NULL)
 	    {
 		dapls_evd_post_connection_event (evd_ptr,

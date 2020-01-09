@@ -15,6 +15,10 @@ if OS_SUSE11
 OSFLAGS += -DSUSE_11
 endif
 
+if DEFINE_ATTR_LINK_LAYER
+XFLAGS = -DDEFINE_ATTR_LINK_LAYER
+endif
+
 if DEBUG
 AM_CFLAGS = -g -Wall -D_GNU_SOURCE -DDAPL_DBG -DDAT_CONF="\"$(sysconfdir)/dat.conf\""
 else
@@ -354,6 +358,9 @@ EXTRA_DIST = dat/common/dat_dictionary.h \
 	     dapl/udapl/libdaplcma.map \
              dapl/udapl/libdaplscm.map \
 	     dapl.spec.in \
+	     LICENSE.txt \
+	     LICENSE2.txt \
+	     LICENSE3.txt \
 	     $(man_MANS) \
 	     test/dapltest/include/dapl_bpool.h \
 	     test/dapltest/include/dapl_client_info.h \
@@ -404,7 +411,11 @@ install-exec-hook:
         echo OpenIB-ipath0-1 u1.2 nonthreadsafe default libdaplscm.so.2 dapl.1.2 '"ipath0 1" ""' >> $(DESTDIR)$(sysconfdir)/dat.conf; \
         echo OpenIB-ipath0-2 u1.2 nonthreadsafe default libdaplscm.so.2 dapl.1.2 '"ipath0 2" ""' >> $(DESTDIR)$(sysconfdir)/dat.conf; \
         echo OpenIB-ehca0-2 u1.2 nonthreadsafe default libdaplscm.so.2 dapl.1.2 '"ehca0 1" ""' >> $(DESTDIR)$(sysconfdir)/dat.conf; \
-        echo OpenIB-iwarp u1.2 nonthreadsafe default libdaplcma.so.1 dapl.1.2 '"eth2 0" ""' >> $(DESTDIR)$(sysconfdir)/dat.conf;
+        echo OpenIB-iwarp u1.2 nonthreadsafe default libdaplcma.so.1 dapl.1.2 '"eth2 0" ""' >> $(DESTDIR)$(sysconfdir)/dat.conf; \
+        echo OpenIB-cma-roe-eth2 u1.2 nonthreadsafe default libdaplcma.so.1 dapl.1.2 '"eth2 0" ""' >> $(DESTDIR)$(sysconfdir)/dat.conf; \
+        echo OpenIB-cma-roe-eth3 u1.2 nonthreadsafe default libdaplcma.so.1 dapl.1.2 '"eth3 0" ""' >> $(DESTDIR)$(sysconfdir)/dat.conf; \
+        echo OpenIB-scm-roe-mlx4_0-1 u1.2 nonthreadsafe default libdaplscm.so.1 dapl.1.2 '"mlx4_0 1" ""' >> $(DESTDIR)$(sysconfdir)/dat.conf; \
+        echo OpenIB-scm-roe-mlx4_0-2 u1.2 nonthreadsafe default libdaplscm.so.1 dapl.1.2 '"mlx4_0 2" ""' >> $(DESTDIR)$(sysconfdir)/dat.conf;
 
 uninstall-hook:
 	if test -e $(DESTDIR)$(sysconfdir)/dat.conf; then \

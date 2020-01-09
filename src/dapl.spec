@@ -32,7 +32,7 @@
 #
 # $Id: $
 Name: compat-dapl
-Version: 1.2.15
+Version: 1.2.19
 Release: 1%{?dist}
 Summary: A Library for userspace access to RDMA devices using OS Agnostic DAT API v1.2.
 
@@ -106,6 +106,10 @@ echo OpenIB-ipath0-1 u1.2 nonthreadsafe default libdaplscm.so.1 dapl.1.2 '"ipath
 echo OpenIB-ipath0-2 u1.2 nonthreadsafe default libdaplscm.so.1 dapl.1.2 '"ipath0 2" ""' >> %{_sysconfdir}/dat.conf
 echo OpenIB-ehca0-1 u1.2 nonthreadsafe default libdaplscm.so.1 dapl.1.2 '"ehca0 1" ""' >> %{_sysconfdir}/dat.conf
 echo OpenIB-iwarp u1.2 nonthreadsafe default libdaplcma.so.1 dapl.1.2 '"eth2 0" ""'  >> %{_sysconfdir}/dat.conf
+echo OpenIB-cma-roe-eth2 u1.2 nonthreadsafe default libdaplcma.so.1 dapl.1.2 '"eth2 0" ""'  >> %{_sysconfdir}/dat.conf
+echo OpenIB-cma-roe-eth3 u1.2 nonthreadsafe default libdaplcma.so.1 dapl.1.2 '"eth3 0" ""'  >> %{_sysconfdir}/dat.conf
+echo OpenIB-scm-roe-mlx4_0-1 u1.2 nonthreadsafe default libdaplscm.so.1 dapl.1.2 '"mlx4_0 1" ""' >> %{_sysconfdir}/dat.conf
+echo OpenIB-scm-roe-mlx4_0-2 u1.2 nonthreadsafe default libdaplscm.so.1 dapl.1.2 '"mlx4_0 2" ""' >> %{_sysconfdir}/dat.conf
 
 %postun
 /sbin/ldconfig
@@ -117,7 +121,7 @@ fi
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libda*.so.*
-%doc AUTHORS README ChangeLog
+%doc AUTHORS README COPYING ChangeLog LICENSE.txt LICENSE2.txt LICENSE3.txt
 
 %files devel
 %defattr(-,root,root,-)
@@ -136,6 +140,18 @@ fi
 %{_mandir}/man5/*.5*
 
 %changelog
+* Mon Aug 9 2010 Arlin Davis <ardavis@ichips.intel.com> - 1.2.19 
+- DAT/DAPL Version 1.2.19 Release 1, OFED 1.5.2 RC4
+
+* Mon Jul 12 2010 Arlin Davis <ardavis@ichips.intel.com> - 1.2.18 
+- DAT/DAPL Version 1.2.18 Release 1, OFED 1.5.2 RC3
+
+* Mon May 24 2010 Arlin Davis <ardavis@ichips.intel.com> - 1.2.17 
+- DAT/DAPL Version 1.2.17 Release 1, OFED 1.5.2 RC1
+
+* Tue Feb 23 2010 Arlin Davis <ardavis@ichips.intel.com> - 1.2.16 
+- DAT/DAPL Version 1.2.16 Release 1, OFED 1.5.1
+
 * Tue Nov 24 2009 Arlin Davis <ardavis@ichips.intel.com> - 1.2.15 
 - DAT/DAPL Version 1.2.15 Release 1, OFED 1.5
 

@@ -293,6 +293,15 @@ dapl_os_thread_create (
 	IN  void			*data,
 	OUT DAPL_OS_THREAD		*thread_id );
 
+STATIC _INLINE_ void
+dapl_os_sleep_usec(int usec)
+{
+        struct timespec sleep, remain;
+
+        sleep.tv_sec = 0;
+        sleep.tv_nsec = usec * 1000;
+        nanosleep(&sleep, &remain);
+}
 
 /*
  * Lock Functions

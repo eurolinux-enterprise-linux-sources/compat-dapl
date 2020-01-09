@@ -1435,7 +1435,7 @@ void cr_thread(void *arg)
 			else
 				dapli_socket_connected(cr,errno);
 		} else {
-			dapl_log(DAPL_DBG_TYPE_WARN,
+			dapl_log(DAPL_DBG_TYPE_CM,
 				 " CM poll ERR, wrong state(%d) -> %s SKIP\n",
 				 cr->state,
 				 inet_ntoa(((struct sockaddr_in*)

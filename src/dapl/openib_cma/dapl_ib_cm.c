@@ -610,10 +610,12 @@ dapls_ib_disconnect(IN DAPL_EP *ep_ptr,
 		dapl_dbg_log(DAPL_DBG_TYPE_ERR,
 			     " disconnect: ID %p ret %d\n", 
 			     ep_ptr->cm_handle, ret);
-
 	/* 
 	 * DAT event notification occurs from the callback
-	 * Note: will fire even if DREQ goes unanswered on timeout 
+	 * Don't wait for event, allow consumer option to
+	 * to give up and destroy cm_id if event is delayed. 
+	 * EP DISCONNECTED state protects against duplicate 
+	 * events being queued.
 	 */
 	return DAT_SUCCESS;
 }

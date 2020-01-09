@@ -81,18 +81,23 @@ dapl_ep_reset (
 	goto bail;
     }
 
+    dapl_os_lock(&ep_ptr->header.lock);
     if ( ep_ptr->param.ep_state != DAT_EP_STATE_UNCONNECTED
 	 && ep_ptr->param.ep_state != DAT_EP_STATE_DISCONNECTED )
     {
 	dat_status = DAT_ERROR (DAT_INVALID_STATE,dapls_ep_state_subtype (ep_ptr));
+	dapl_os_unlock(&ep_ptr->header.lock);
 	goto bail;
     }
 
     if ( ep_ptr->param.ep_state == DAT_EP_STATE_DISCONNECTED )
     {
+	dapl_os_unlock(&ep_ptr->header.lock);
 	dapls_ib_reinit_ep ( ep_ptr );
+	dapl_os_lock(&ep_ptr->header.lock);
 	ep_ptr->param.ep_state = DAT_EP_STATE_UNCONNECTED;
     }
+    dapl_os_unlock(&ep_ptr->header.lock);
 
  bail:
     return dat_status;

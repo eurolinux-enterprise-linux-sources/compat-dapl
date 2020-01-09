@@ -471,6 +471,14 @@ DAT_RETURN dapls_ib_query_hca (
 							     hca_ptr->ib_trans.ack_timer);
 		hca_ptr->ib_trans.mtu		  = DAPL_MIN(port_attr.active_mtu,
 							     hca_ptr->ib_trans.mtu);
+#ifdef DEFINE_ATTR_LINK_LAYER
+                if (port_attr.link_layer == IBV_LINK_LAYER_ETHERNET)
+                        hca_ptr->ib_trans.global = 1;
+
+                dapl_log(DAPL_DBG_TYPE_UTIL,
+                         " query_hca: port.link_layer = 0x%x\n",
+                         port_attr.link_layer);
+#endif
 		dapl_dbg_log (DAPL_DBG_TYPE_UTIL, 
 			" query_hca: (%x.%x) ep %d ep_q %d evd %d evd_q %d mtu %d\n", 
 			ia_attr->hardware_version_major,

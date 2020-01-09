@@ -1,3 +1,172 @@
+commit 53ec06871c4eeffc431b262ff5ddac0196f6ffe3
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Mon Aug 2 09:41:07 2010 -0700
+
+    common, cma: disconnect and cleanup CR linkings after DTO error on EP
+    
+    Add a cleanup to remove CR from SP and EP
+    during DTO errors in dapli_evd_cqe_to_event.
+    Initiate a provider disconnect request since
+    the QP error is independent of CM processing.
+    
+    dapl_sp_remove_ep needs to remove cr_ptr
+    reference from EP before freeing cr object.
+    
+    rescind commit a1038414a55e05673cbfab284516e2b5fae04
+    
+    Provider disconnect should not wait on disconnect
+    event. Let consumer choose decide to wait on
+    event or go ahead and destroy if taking too long.
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit eed4af0d26515bf714979a64ed8804fa593da535
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Mon Jul 12 12:39:33 2010 -0700
+
+    Release 1.2.18
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit 520a1038414a55e05673cbfab284516e2b5fae04
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Wed Jul 7 11:31:44 2010 -0700
+
+    common: race conditions with DTO error, disconnect and dapl_reset_ep
+    
+    Add locking to dapl_ep_reset to avoid race condition with disconnect events
+    and DTO errors. During DTO errors in cqe_to_event call there is
+    no need for manual disconnect processing. During disconnect
+    phase the CMA provider should wait while DISCONNECT_PENDING.
+    The EP could move directly to UNCONNECTED state with dapl_reset_ep().
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit ac5b18461dab6feca1ff339e8ca972e831c554db
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Tue Jul 6 15:54:13 2010 -0700
+
+    common: add new dapl_os_sleep_usec() function
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit c81ff5b89f5951f38c493d3c2e39f7e54c8a65c6
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Wed Jun 30 12:13:53 2010 -0700
+
+    configure: need a false conditional for verbs attr.link_layer member check
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit e3309c2db15dd2573e40a141eedc74e1b992a7ba
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Mon May 24 16:43:00 2010 -0700
+
+    Release 1.2.17
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit cc9834ee7da9a85a2c938a5c26d6abd9176f1a86
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Mon May 24 16:37:03 2010 -0700
+
+    config: add conditional check for new verbs port_attr.link_layer
+    
+    Check for link_layer type ETHERNET and set global for GID
+    configuration on modify QP.
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit 68e15b652d86081f24c4d9ad521430ba19809016
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Mon May 24 10:24:51 2010 -0700
+
+    cma, scm: new provider entries for Mellanox RDMA over Ethernet device for uDAPL v1.2
+    
+    Add options for netdev eth2 and eth3 for cma and for device mlx4_0 port 1 and 2 for scm
+    
+    OpenIB-cma-roe-eth2 u1.2 nonthreadsafe default libdaplcma.so.1 dapl.1.2 "eth2 0" ""
+    OpenIB-cma-roe-eth3 u1.2 nonthreadsafe default libdaplcma.so.1 dapl.1.2 "eth3 0" ""
+    OpenIB-scm-roe-mlx4_0-1 u1.2 nonthreadsafe default libdaplscm.so.1 dapl.1.2 "mlx4_0 1" ""
+    OpenIB-scm-roe-mlx4_0-2 u1.2 nonthreadsafe default libdaplscm.so.1 dapl.1.2 "mlx4_0 2" ""
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit 28d1a1ae45649211dafd52b0ce756891eefdbe5e
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Fri Apr 9 13:46:34 2010 -0700
+
+    cma: memory leak of verbs CQ and completion channels created during dat_ia_open
+    
+    check/cleanup CQ and completion channels during dat_ia_close
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit 128040a9c934d6d83c34af33b154a1d1aba405d9
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Fri Apr 9 13:44:15 2010 -0700
+
+    cma: memory leak of FD's (pipe) created during dat_evd_create
+    
+    Add checking for pipe FD's during destroy and clean them up with close.
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit 74295e8e58e8e9ebef80e3f14448dcb11d14db0c
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Tue Feb 23 16:17:18 2010 -0800
+
+    Release 1.2.16-1
+    
+    dapl.spec.in changelog date needs updated to 2010
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit 83d430412bb99497bf8cdf0292ae25d9ea601e89
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Tue Feb 23 16:04:42 2010 -0800
+
+    Release 1.2.16-1
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit b41458d2d97647e003a48388e9166ab504e1d136
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Wed Feb 3 11:15:56 2010 -0800
+
+    Update Copyright file and include the 3 license files in distribution
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit f72e5cb77f65c5b45c8b426995dfb358d65fd025
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Fri Jan 22 15:36:45 2010 -0800
+
+    cma: max sge incorrectly decremented during ibv_device_query
+    
+    During dat_ia_query, the provider was incorrectly decrementing
+    reported max sge by 1 if inline data was set. Remove adjustment.
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit d3e8a9224f0d2f0deb4349e643f1e65d9e3cec1e
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Tue Nov 24 11:09:35 2009 -0800
+
+    Release 1.2.15-1
+    
+    update spec file
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
+commit bab90f50d51348c1120d4386d728fb2f645e3fdb
+Author: Arlin Davis <arlin.r.davis@intel.com>
+Date:   Tue Nov 24 11:01:16 2009 -0800
+
+    Release 1.2.15
+    
+    Signed-off-by: Arlin Davis <arlin.r.davis@intel.com>
+
 commit bc36aedeb2b4bde89e7797ff13e6764f3f024b21
 Author: Arlin Davis <arlin.r.davis@intel.com>
 Date:   Tue Nov 24 11:00:04 2009 -0800

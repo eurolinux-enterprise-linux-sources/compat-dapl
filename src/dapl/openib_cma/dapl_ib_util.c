@@ -373,12 +373,6 @@ DAT_RETURN dapls_ib_close_hca(IN DAPL_HCA *hca_ptr)
 	dapl_dbg_log(DAPL_DBG_TYPE_UTIL," close_hca: %p->%p\n",
 		     hca_ptr,hca_ptr->ib_hca_handle);
 
-	if (hca_ptr->ib_hca_handle != IB_INVALID_HANDLE) {
-		if (rdma_destroy_id(hca_ptr->ib_trans.cm_id)) 
-			return(dapl_convert_errno(errno,"ib_close_device"));
-		hca_ptr->ib_hca_handle = IB_INVALID_HANDLE;
-	}
-
 	dapl_os_lock(&g_hca_lock);
 	if (g_ib_thread_state != IB_THREAD_RUN) {
 		dapl_os_unlock(&g_hca_lock);
@@ -410,6 +404,22 @@ DAT_RETURN dapls_ib_close_hca(IN DAPL_HCA *hca_ptr)
 		nanosleep (&sleep, &remain);
 	}
 bail:
+	if (hca_ptr->ib_trans.ib_cq)
+		ibv_destroy_comp_channel(hca_ptr->ib_trans.ib_cq);
+
+	if (hca_ptr->ib_trans.ib_cq_empty) {
+		struct ibv_comp_channel *channel;
+		channel = hca_ptr->ib_trans.ib_cq_empty->channel;
+		ibv_destroy_cq(hca_ptr->ib_trans.ib_cq_empty);
+		ibv_destroy_comp_channel(channel);
+	}
+
+	if (hca_ptr->ib_hca_handle != IB_INVALID_HANDLE) {
+		if (rdma_destroy_id(hca_ptr->ib_trans.cm_id))
+			return (dapl_convert_errno(errno, "ib_close_device"));
+		hca_ptr->ib_hca_handle = IB_INVALID_HANDLE;
+	}
+
 	return (DAT_SUCCESS);
 }
   
@@ -457,15 +467,6 @@ DAT_RETURN dapls_ib_query_hca(IN DAPL_HCA *hca_ptr,
 			     ibv_query_port(hca_ptr->ib_hca_handle, 
 					    hca_ptr->port_num, &port_attr))
 		return(dapl_convert_errno(errno,"ib_query_hca"));
-
-	/*
-	 * There is no query for inline data so there is no way to
-	 * calculate the impact on sge nor the max inline send. Most
-	 * implementions consume 1 or none so just reduce by 1 until
-	 * we are provided with a query mechanism from verbs.
-	 */
-        if (hca_ptr->ib_trans.max_inline_send)
-                        dev_attr.max_sge--;
 
 	if (ia_attr != NULL) {
 		(void) dapl_os_memzero(ia_attr, sizeof(*ia_attr));

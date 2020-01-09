@@ -462,8 +462,11 @@ dapls_ib_wait_object_create(IN DAPL_EVD *evd_ptr,
 		ibv_create_comp_channel(
 			evd_ptr->header.owner_ia->hca_ptr->ib_hca_handle);	
 		
-	if ((*p_cq_wait_obj_handle)->events == NULL) 		
+	if ((*p_cq_wait_obj_handle)->events == NULL) {
+		close((*p_cq_wait_obj_handle)->pipe[0]);
+		close((*p_cq_wait_obj_handle)->pipe[1]);
 		goto bail;
+	}
 
 	return DAT_SUCCESS;
 bail:
@@ -482,6 +485,9 @@ dapls_ib_wait_object_destroy(IN ib_wait_obj_handle_t p_cq_wait_obj_handle)
 		     p_cq_wait_obj_handle );
 	
 	ibv_destroy_comp_channel(p_cq_wait_obj_handle->events);
+
+	close(p_cq_wait_obj_handle->pipe[0]);
+	close(p_cq_wait_obj_handle->pipe[1]);
 
 	dapl_os_free(p_cq_wait_obj_handle, 
 		     sizeof(struct _ib_wait_obj_handle));
