@@ -1,0 +1,135 @@
+---
+ dapl/udapl/linux/dapl_osd.h               |   37 +++++++++++++++++++++++++++++-
+ test/dapltest/mdep/linux/dapl_mdep_user.c |    9 +++++++
+ test/dapltest/mdep/linux/dapl_mdep_user.h |    9 ++++++-
+ 3 files changed, 53 insertions(+), 2 deletions(-)
+
+--- a/dapl/udapl/linux/dapl_osd.h
++++ b/dapl/udapl/linux/dapl_osd.h
+@@ -49,7 +49,9 @@
+ #error UNDEFINED OS TYPE
+ #endif /* __linux__ */
+ 
+-#if !defined (__i386__) && !defined (__ia64__) && !defined(__x86_64__) && !defined(__PPC__) && !defined(__PPC64__)
++#if !defined(__i386__) && !defined(__ia64__) \
++&& !defined(__x86_64__) && !defined(__PPC__) && !defined(__PPC64__) \
++&& !defined(__s390x__)
+ #error UNDEFINED ARCH
+ #endif
+ 
+@@ -142,6 +144,22 @@ int dapl_os_get_env_val (
+ 
+ 
+ /* atomic functions */
++#ifdef __s390x__
++#define DAPL_CS_ADD(ptr, op_val) ({		\
++	int old_val, new_val;				\
++	__asm__ __volatile__(				\
++		"	l	%0,%2\n"		\
++		"0:	lr	%1,%0\n"		\
++		"	ar	%1,%3\n"		\
++		"	cs	%0,%1,%2\n"		\
++		"	jl	0b"			\
++		: "=&d" (old_val), "=&d" (new_val),	\
++		  "=Q" (*ptr)				\
++		: "d" (op_val), "Q" (*ptr)		\
++		: "cc", "memory");			\
++	new_val;					\
++})
++#endif
+ 
+ /* dapl_os_atomic_inc
+  *
+@@ -165,6 +183,11 @@ dapl_os_atomic_inc (
+ #else
+ 	IA64_FETCHADD(old_value,v,1,4);
+ #endif
++#elif defined(__s390x__)
++	DAT_COUNT	tmp;
++	DAT_COUNT	delta = 1;
++
++	tmp = DAPL_CS_ADD(v, delta);
+ #elif defined(__PPC__) || defined(__PPC64__)
+ 	int tmp;
+ 
+@@ -204,6 +227,11 @@ dapl_os_atomic_dec (
+ #else
+ 	IA64_FETCHADD(old_value,v,-1,4);
+ #endif
++#elif defined(__s390x__)
++	DAT_COUNT	tmp;
++	DAT_COUNT	delta = -1;
++
++	tmp = DAPL_CS_ADD(v, delta);
+ #elif defined (__PPC__) || defined(__PPC64__)
+ 	int tmp;
+ 
+@@ -259,6 +287,13 @@ dapl_os_atomic_assign (
+ #else
+     current_value = ia64_cmpxchg(acq,v,match_value,new_value,4);
+ #endif /* __ia64__ */
++#elif defined(__s390x__)
++	__asm__ __volatile__(
++		"	cs	%0,%2,%1\n"
++		: "+d" (match_value), "=Q" (*v)
++		: "d" (new_value), "Q" (*v)
++		: "cc", "memory");
++	current_value = match_value;
+ #elif defined(__PPC__) || defined(__PPC64__)
+         __asm__ __volatile__ (
+ "       lwsync\n\
+--- a/test/dapltest/mdep/linux/dapl_mdep_user.c
++++ b/test/dapltest/mdep/linux/dapl_mdep_user.c
+@@ -181,6 +181,14 @@ DT_Mdep_GetTime (void)
+     return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+ }
+ 
++#ifdef __s390x__
++double
++DT_Mdep_GetCpuMhz (
++    void )
++{
++	return 1;
++}
++#else
+ double
+ DT_Mdep_GetCpuMhz (
+     void )
+@@ -232,6 +240,7 @@ DT_Mdep_GetCpuMhz (
+     return strtod (mhz_str, NULL) / DT_TSC_BASE;
+ }
+ 
++#endif
+ 
+ unsigned long
+ DT_Mdep_GetContextSwitchNum (void )
+--- a/test/dapltest/mdep/linux/dapl_mdep_user.h
++++ b/test/dapltest/mdep/linux/dapl_mdep_user.h
+@@ -143,11 +143,18 @@ DT_Mdep_GetTimeStamp ( void )
+       asm volatile("rdtsc" : "=a" (__a), "=d" (__d)); 
+       return ((unsigned long)__a) | (((unsigned long)__d)<<32);
+ #else
++#if defined(__s390x__)
++	DT_Mdep_TimeStamp x;
++
++	asm volatile("stck %0" : "=Q" (x) : : "cc");
++	return x >> 2;
++#else
+ #error "Linux CPU architecture - unimplemented"
+ #endif
+ #endif
+ #endif
+ #endif
++#endif
+ }
+ 
+ /*
+@@ -157,7 +164,7 @@ DT_Mdep_GetTimeStamp ( void )
+  * world. E.g. %llx for gcc, %I64x for Windows
+  */
+ 
+-#if defined(__x86_64__) || defined(__ia64__)
++#if defined(__x86_64__) || defined(__ia64__) || defined(__s390x__)
+ #define F64d   "%ld"
+ #define F64u   "%lu"
+ #define F64x   "%lx"

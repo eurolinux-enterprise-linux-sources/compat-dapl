@@ -1,20 +1,21 @@
 Name: compat-dapl
 Epoch: 1
 Version: 1.2.19
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Library providing access to the DAT 1.2 API
 Group: System Environment/Libraries
 Obsoletes: udapl < 1.3, dapl < 1.2.2, compat-dapl-1.2.5 < 2.1
 License: GPLv2 or BSD or CPL
-Url: http://openfabrics.org/
-Source0: http://www.openfabrics.org/downloads/dapl/%{name}-%{version}.tar.gz
+Url: https://openfabrics.org/
+Source0: https://www.openfabrics.org/downloads/dapl/%{name}-%{version}.tar.gz
 Patch0: compat-dapl-1.2.19-compile.patch
+Patch1: 0005-compat-dapl-add-s390x-platform-support.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires: libibverbs-devel > 1.1.4, librdmacm-devel > 1.0.14
 BuildRequires: autoconf, libtool, dapl-devel > 2.0.31
-ExclusiveArch: %{ix86} x86_64 ia64 ppc ppc64
+ExcludeArch: aarch64 s390
 %description
 The DAT programming API provides a means of utilizing high performance
 network technologies, such as InfiniBand and iWARP, without needing to
@@ -48,7 +49,8 @@ Useful test suites to validate the dapl library API's and operation.
 
 %prep
 %setup -q
-%patch0 -p1 -b.orig
+%patch0 -p1 -b .compile
+%patch1 -p1 -b .s390x
 aclocal -I config && libtoolize --force --copy && autoheader && \
     automake --foreign --add-missing --copy && autoconf
 
@@ -96,6 +98,10 @@ rm -rf %{buildroot}
 %{_mandir}/man1/*1.1.gz
 
 %changelog
+* Thu Jul 16 2015 Doug Ledford <dledford@redhat.com> - 1:1.2.19-4
+- Add s390 support patch
+- Resolves: bz1196211
+
 * Mon Jan 6 2014 Jay Fenlason <fenlason@redhat.com> - 1:1.2.19-3
 - Add -compile patch
   Resolves: rhbz1048849
