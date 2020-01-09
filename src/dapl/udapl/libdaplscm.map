@@ -1,0 +1,6 @@
+DAPL_SCM_1.2 {
+        global:
+		dat_provider_fini;
+		dat_provider_init;
+    	local: *;
+};
