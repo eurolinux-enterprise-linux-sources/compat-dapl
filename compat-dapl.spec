@@ -1,13 +1,14 @@
 Name: compat-dapl
 Epoch: 1
 Version: 1.2.19
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Library providing access to the DAT 1.2 API
 Group: System Environment/Libraries
 Obsoletes: udapl < 1.3, dapl < 1.2.2, compat-dapl-1.2.5 < 2.1
 License: GPLv2 or BSD or CPL
 Url: http://openfabrics.org/
 Source0: http://www.openfabrics.org/downloads/dapl/%{name}-%{version}.tar.gz
+Patch0: compat-dapl-1.2.19-compile.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
@@ -47,6 +48,7 @@ Useful test suites to validate the dapl library API's and operation.
 
 %prep
 %setup -q
+%patch0 -p1 -b.orig
 aclocal -I config && libtoolize --force --copy && autoheader && \
     automake --foreign --add-missing --copy && autoconf
 
@@ -94,6 +96,13 @@ rm -rf %{buildroot}
 %{_mandir}/man1/*1.1.gz
 
 %changelog
+* Mon Jan 6 2014 Jay Fenlason <fenlason@redhat.com> - 1:1.2.19-3
+- Add -compile patch
+  Resolves: rhbz1048849
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com>
+- Mass rebuild 2013-12-27
+
 * Mon Jan 23 2012 Doug Ledford <dledford@redhat.com> - 1:1.2.19-2
 - Bump and rebuild against new libibverbs (FDR link speed support)
 - Related: bz750609
@@ -108,7 +117,7 @@ rm -rf %{buildroot}
 - compat-dapl-cleanup-cr-linkings-after-dto-error-on-ep.patch
   Resolves: bz635155
 
-* Mon Aug 01 2010 Jay Fenlason <fenlason@redhat.com> - 1:1.2.15-2.1.el6
+* Mon Aug 02 2010 Jay Fenlason <fenlason@redhat.com> - 1:1.2.15-2.1.el6
 - Include pipe-leak patch to close
   Resolves: rhbz619439 - OFED1.5.1: uDAPL - cma: memory leak of FD's (DB2 pureScale)
   This required some whitspace editing--apparently the patch was garbled

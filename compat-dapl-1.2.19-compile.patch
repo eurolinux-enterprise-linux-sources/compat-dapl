@@ -1,0 +1,11 @@
+--- compat-dapl-1.2.19/dat/common/dat_strerror.c.orig	2014-01-06 15:46:44.937613612 -0500
++++ compat-dapl-1.2.19/dat/common/dat_strerror.c	2014-01-06 15:46:59.656227202 -0500
+@@ -618,7 +618,7 @@ dat_strerror (
+     {
+ 	return DAT_INVALID_PARAMETER;
+     }
+-    else if (minor_message != NULL)
++    else if (minor_message)
+     {
+ 	if ( DAT_SUCCESS != dat_strerror_minor (value, minor_message) )
+ 	{
